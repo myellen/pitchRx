@@ -295,8 +295,8 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
   #scrape boxscores
   if (any(grepl("boxscore.xml", suffix))) {
     inning.files <- paste0(gameDir, "/boxscore.xml")
-    nms <- names(obs)
     obs <- XML2Obs(inning.files, as.equiv=TRUE, url.map=FALSE, ...)
+    nms <- names(obs)
     #simplify names
     nms <- gsub("boxscore//linescore//inning_line_score", "inning_line_score", nms)
     nms <- gsub("boxscore//linescore", "linescore", nms)
