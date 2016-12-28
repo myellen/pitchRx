@@ -4,6 +4,8 @@
 #' \href{http://gd2.mlb.com/components/game/mlb/year_2011/month_04/day_04/gid_2011_04_04_minmlb_nyamlb_1/inning/inning_all.xml}{inning/inning_all.xml},
 #' \href{http://gd2.mlb.com/components/game/mlb/year_2011/month_04/day_04/gid_2011_04_04_minmlb_nyamlb_1/inning/inning_hit.xml}{inning/inning_hit.xml},
 #' \href{http://gd2.mlb.com/components/game/mlb/year_2011/month_04/day_04/gid_2011_04_04_minmlb_nyamlb_1/players.xml}{players.xml}, or
+#' \href{http://gd2.mlb.com/components/game/mlb/year_2011/month_04/day_04/gid_2011_04_04_minmlb_nyamlb_1/boxscore.xml}{boxscore.xml}, or
+#' \href{http://gd2.mlb.com/components/game/mlb/year_2011/month_04/day_04/gid_2011_04_04_minmlb_nyamlb_1/rawboxscore.xml}{rawboxscore.xml}, or
 #' \href{http://gd2.mlb.com/components/game/mlb/year_2011/month_04/day_04/gid_2011_04_04_minmlb_nyamlb_1/miniscoreboard.xml}{miniscoreboard.xml}.
 #' It's worth noting that PITCHf/x is contained in files ending with "inning/inning_all.xml", but the other files can complement this data depending on the goal for analysis.
 #' Any collection of file names may be passed to the \code{suffix} argument, and \code{scrape} will retrieve data from a (possibly large number)
@@ -17,7 +19,7 @@
 #' @param game.ids character vector of gameday_links. If this option is used, \code{start} and \code{end} are ignored.
 #' See \code{data(gids, package="pitchRx")} for examples.
 #' @param suffix character vector with suffix of the XML files to be parsed. Currently supported options are:
-#' 'players.xml', 'miniscoreboard.xml', 'inning/inning_all.xml', 'inning/inning_hit.xml'.
+#' 'players.xml', 'miniscoreboard.xml', 'inning/inning_all.xml', 'inning/inning_hit.xml', 'boxscore.xml', 'rawboxscore.xml'.
 #' @param connect A database connection object. The class of the object should be "MySQLConnection" or "SQLiteConnection".
 #' If a valid connection is supplied, tables will be copied to the database, which will result in better memory management.
 #' If a connection is supplied, but the connection fails for some reason, csv files will be written to the working directory.
@@ -94,9 +96,9 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
   }
   #check for valid file inputs
   message("If file names don't print right away, please be patient.")
-  valid.suffix <- c("inning/inning_all.xml", "inning/inning_hit.xml", "miniscoreboard.xml", "players.xml")
+  valid.suffix <- c("inning/inning_all.xml", "inning/inning_hit.xml", "miniscoreboard.xml", "players.xml", "boxscore.xml", "rawboxscore.xml")
   if (!all(suffix %in% valid.suffix)) {
-    warning("Currently supported file suffix are: 'inning/inning_all.xml', 'inning/inning_hit.xml', 'miniscoreboard.xml', and 'players.xml'")
+    warning("Currently supported file suffix are: 'inning/inning_all.xml', 'inning/inning_hit.xml', 'miniscoreboard.xml', and 'players.xml', 'boxscore.xml', 'rawboxscore.xml'")
     Sys.sleep(5) #time to read warning
   }
   if (missing(game.ids)) {
@@ -289,6 +291,38 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
       }
     }
   }
+
+  #scrape boxscores
+  if (any(grepl("boxscore.xml", suffix))) {
+    inning.files <- paste0(gameDir, "/boxscore.xml")
+    nms <- names(obs)
+    obs <- XML2Obs(inning.files, as.equiv=TRUE, url.map=FALSE, ...)
+    #simplify names
+    nms <- gsub("boxscore//linescore//inning_line_score", "inning_line_score", nms)
+    nms <- gsub("boxscore//linescore", "linescore", nms)
+    nms <- gsub("boxscore//pitching//pitcher", "pitcher", nms)
+    nms <- gsub("boxscore//pitching", "pitching", nms)
+    nms <- gsub("boxscore//batting//batter", "batter", nms)
+    nms <- gsub("boxscore//batting", "batting", nms)
+    obs <- setNames(obs, nms)
+    if (exists("tables")){
+      tables <- c(tables, collapse_obs2(obs)) #only one table
+    } else {
+      tables <- collapse_obs2(obs)
+    }
+    names(tables) <- sub("^hitchart//hip$", "hip", names(tables))
+    #Coerce matrices to data frames; turn appropriate variables into numerics
+    for (i in names(tables)) tables[[i]] <- format.table(tables[[i]], name=i)
+    if (!missing(connect)) {
+      #Try to write tables to database, if that fails, write to csv. Then clear up memory
+      for (i in names(tables)) export(connect, name = i, value = tables[[i]], template = fields[[i]])
+      rm(obs)
+      rm(tables)
+      message("Collecting garbage")
+      gc()
+    }
+  }
+
   if (exists("tables")) {
     return(tables)
   } else {
