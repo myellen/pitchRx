@@ -359,8 +359,8 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     obs <- setNames(obs, nms)
 
     #no longer need the 'game' and 'game//team' observations
-    game.idx <- grep("game", nms)
-    if (length(game.idx) > 0) obs <- obs[-game.idx]
+    #game.idx <- grep("game", nms)
+    #if (length(game.idx) > 0) obs <- obs[-game.idx]
 
     if (exists("tables")){
       tables <- c(tables, collapse_obs2(obs)) #only one table
