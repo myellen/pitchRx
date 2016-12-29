@@ -346,9 +346,8 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     obs <- add_key(obs, parent='boxscore', recycle='start_time', quiet=TRUE)
     obs <- add_key(obs, parent='boxscore', recycle='weather', quiet=TRUE)
     obs <- add_key(obs, parent='boxscore', recycle='gameday_sw', quiet=TRUE)
-    ##
-    # obs <- add_key(obs, parent='boxscore', recycle='url', quiet=TRUE)
-    obs <- add_key(obs, parent='boxscore', recycle='gameday_link', quiet=TRUE)
+    obs <- add_key(obs, parent='boxscore', recycle='url', quiet=TRUE)
+    # obs <- add_key(obs, parent='boxscore', recycle='gameday_link', quiet=TRUE) # this is an issue
 
      nms <- names(obs)
     #simplify names
