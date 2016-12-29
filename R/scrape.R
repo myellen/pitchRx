@@ -293,7 +293,8 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
   }
 
   #scrape boxscores
-  if (any(grepl("boxscore.xml", suffix))) {
+  #if (any(grepl("boxscore.xml", suffix))) {
+  if ("boxscore.xml" %in% suffix) {
     boxscore.files <- paste0(gameDir, "/boxscore.xml")
     obs <- XML2Obs(boxscore.files, as.equiv=TRUE, url.map=FALSE, ...)
     nms <- names(obs)
@@ -324,7 +325,8 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
   }
 
   #scrape raw boxscores
-  if (any(grepl("rawboxscore.xml", suffix))) {
+  #if (any(grepl("rawboxscore.xml", suffix))) {
+  if ("rawboxscore.xml" %in% suffix) {
     rawboxscore.files <- paste0(gameDir, "/rawboxscore.xml")
     obs <- XML2Obs(rawboxscore.files, as.equiv=TRUE, url.map=FALSE, ...)
     #recycle information on the team level (there are two per file)
