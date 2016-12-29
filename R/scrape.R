@@ -294,8 +294,8 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
 
   #scrape boxscores
   if (any(grepl("boxscore.xml", suffix))) {
-    inning.files <- paste0(gameDir, "/boxscore.xml")
-    obs <- XML2Obs(inning.files, as.equiv=TRUE, url.map=FALSE, ...)
+    boxscore.files <- paste0(gameDir, "/boxscore.xml")
+    obs <- XML2Obs(boxscore.files, as.equiv=TRUE, url.map=FALSE, ...)
     nms <- names(obs)
     #simplify names
     nms <- gsub("boxscore//linescore//inning_line_score", "inning_line_score", nms)
@@ -305,6 +305,46 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     nms <- gsub("boxscore//batting//batter", "batter", nms)
     nms <- gsub("boxscore//batting", "batting", nms)
     obs <- setNames(obs, nms)
+    if (exists("tables")){
+      tables <- c(tables, collapse_obs2(obs)) #only one table
+    } else {
+      tables <- collapse_obs2(obs)
+    }
+    names(tables) <- sub("^hitchart//hip$", "hip", names(tables))
+    #Coerce matrices to data frames; turn appropriate variables into numerics
+    for (i in names(tables)) tables[[i]] <- format.table(tables[[i]], name=i)
+    if (!missing(connect)) {
+      #Try to write tables to database, if that fails, write to csv. Then clear up memory
+      for (i in names(tables)) export(connect, name = i, value = tables[[i]], template = fields[[i]])
+      rm(obs)
+      rm(tables)
+      message("Collecting garbage")
+      gc()
+    }
+  }
+
+  #scrape raw boxscores
+  if (any(grepl("rawboxscore.xml", suffix))) {
+    rawboxscore.files <- paste0(gameDir, "/rawboxscore.xml")
+    obs <- XML2Obs(boxscore.files, as.equiv=TRUE, url.map=FALSE, ...)
+    #recycle information on the team level (there are two per file)
+    #obs <- add_key(obs, parent="box", recycle="id", key.name="name_abbrev", quiet=TRUE)
+    #obs <- add_key(obs, parent="game//team", recycle="type", quiet=TRUE)
+    #obs <- add_key(obs, parent="game//team", recycle="name", quiet=TRUE)
+    nms <- names(obs)
+    #simplify names
+    nms <- gsub("boxscore//team//batting//batter", "batter", nms)
+    nms <- gsub("boxscore//team//pitching//pitcher//strikeout", "strikeout", nms)
+    nms <- gsub("boxscore//team//pitching//pitcher", "pitcher", nms)
+    nms <- gsub("boxscore//linescore//inning_line_score", "inning_line_score", nms)
+    nms <- gsub("boxscore//team//pitching//pitcher//walk", "walk", nms)
+    nms <- gsub("boxscore//team//batting//batter//double", "double", nms)
+    obs <- setNames(obs, nms)
+
+    #no longer need the 'game' and 'game//team' observations
+    game.idx <- grep("game", nms)
+    if (length(game.idx) > 0) obs <- obs[-game.idx]
+
     if (exists("tables")){
       tables <- c(tables, collapse_obs2(obs)) #only one table
     } else {
