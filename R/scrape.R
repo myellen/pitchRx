@@ -343,13 +343,14 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     obs <- add_key(obs, parent='boxscore', recycle='elapsed_time', quiet=TRUE)
     obs <- add_key(obs, parent='boxscore', recycle='game_id', quiet=TRUE)
     obs <- add_key(obs, parent='boxscore', recycle='venue_id', quiet=TRUE)
-    ##
     obs <- add_key(obs, parent='boxscore', recycle='start_time', quiet=TRUE)
     obs <- add_key(obs, parent='boxscore', recycle='weather', quiet=TRUE)
     obs <- add_key(obs, parent='boxscore', recycle='gameday_sw', quiet=TRUE)
+    ##
     # obs <- add_key(obs, parent='boxscore', recycle='url', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='gameday_link', quiet=TRUE)
-    nms <- names(obs)
+    obs <- add_key(obs, parent='boxscore', recycle='gameday_link', quiet=TRUE)
+
+     nms <- names(obs)
     #simplify names
     nms <- gsub("boxscore//team//batting//batter", "batter", nms)
     nms <- gsub("boxscore//team//pitching//pitcher//strikeout", "strikeout", nms)
