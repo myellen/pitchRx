@@ -341,11 +341,28 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     nms <- gsub("boxscore//linescore", "linescore", nms)
     nms <- gsub("boxscore//team//pitching//pitcher//walk", "walk", nms)
     nms <- gsub("boxscore//team//batting//batter//double", "double", nms)
-    nms <- gsub("boxscore//umpires//umpire", "umpire", nms)
+
+    nms <- gsub('batter//caught_stealing', 'batter_caught_stealing', nms)
+    nms <- gsub('batter//double', 'batter_double', nms)
+    nms <- gsub('batter//error', 'batter_error', nms)
+    nms <- gsub('batter//hit_by_pitch', 'batter_hit_by_pitch', nms)
+    nms <- gsub('batter//home_run', 'batter_home_run', nms)
+    nms <- gsub('batter//intentional_walk', 'batter_intentional_walk', nms)
+    nms <- gsub('batter//outfield_assist', 'batter_outfield_assist', nms)
+    nms <- gsub('batter//pickoff', 'batter_pickoff', nms)
+    nms <- gsub('batter//pinch_hit', 'batter_pinch_hit', nms)
+    nms <- gsub('batter//pinch_run', 'batter_pinch_run', nms)
+    nms <- gsub('batter//sac_bunt', 'batter_sac_bunt', nms)
+    nms <- gsub('batter//sac_fly', 'batter_sac_fly', nms)
+    nms <- gsub('batter//stolen_base', 'batter_stolen_base', nms)
+    nms <- gsub('batter//triple', 'batter_triple', nms)
+    nms <- gsub('pitcher//relief_no_out', 'pitcher_relief_no_out', nms)
+    nms <- gsub('pitcher//walk', 'pitcher_walk', nms)
+
     obs <- setNames(obs, nms)
 
     #no longer need the 'game' and 'game//team' observations
-    game.idx <- c(grep('boxscore//team', nms),grep('inning_line_score', nms))
+    game.idx <- c(grep('boxscore//team', nms), grep('inning_line_score', nms), grep('umpire', nms))
     if (length(game.idx) > 0) obs <- obs[-game.idx]
 
     if (exists("tables")){
@@ -595,7 +612,38 @@ format.table <- function(dat, name) {
                            "pz", "x0", "y0", "z0", "vx0", "vy0", "vz0", "ax", "ay", "az", "type_confidence",
                            "zone", "nasty", "spin_dir", "spin_rate", "inning", "num", "on_1b", "on_2b", "on_3b"),
          po = nums <- c("inning", "num"),
-         runner = nums <- c("id", "inning", "num"))
+         runner = nums <- c("id", "inning", "num"),
+         strikeout = nums <- c("event", "batter_id", "team_id", "pitcher_id"),
+         pitcher_walk = nums <- c("event", "batter_id", "team_id", "pitcher_id"),
+         pitcher_relief_no_out = nums <- c("inning_num","batters_faced" , "event", "team_id", "pitcher_id"),
+         linescore = nums <- c("home_team_runs", "home_team_errors", "home_team_hits", "away_team_errors", "away_team_runs", "away_team_hits"),
+         boxscore = nums <- c("game_pk", "home_league_id", "venue_id"),
+         batter_triple = nums <- c("event", "batter_id", "team_id", "pitcher_id"),
+         batter_stolen_base = nums <- c("event", "batter_id", "team_id", "pitcher_id", "map_order", "base_num", "catcher_id"),
+         batter_sac_fly = nums <- c("event", "batter_id", "team_id", "pitcher_id"),
+         batter_sac_bunt = nums <- c("event", "batter_id", "team_id", "pitcher_id"),
+         batter_pinch_run = nums <- c("event", "batter_id", "team_id", "inning_num", "replaced_id", "sequence"),
+         batter_pinch_hit = nums <- c("event", "batter_id", "team_id", "inning_num", "replaced_id"),
+         batter_pickoff = nums <- c("base_num", "event", "runner_id", "batter_id", "team_id", "map_order", "fielder_id"),
+         batter_outfield_assist = nums <- c("event", "runner_id", "team_id", "batter_id"),
+         batter_intentional_walk = nums <- c("event", "pitcher_id", "team_id", "batter_id"),
+         batter_home_run = nums <- c("inning_num", "event", "outs", "pitcher_id", "runners_on", "team_id", "batter_id"),
+         batter_hit_by_pitch = nums <- c("event", "batter_id", "team_id", "pitcher_id"),
+         batter_error = nums <- c("event", "batter_id", "team_id"),
+         batter_double = nums <- c("event", "batter_id", "team_id", "pitcher_id"),
+         batter_caught_stealing = nums <- c("map_order", "event", "batter_id", "team_id", "pitcher_id", "catcher_id"),
+         batter = nums <- c("sac", "bis_obp", "bam_s_sb", "bis_avg", "bb", "first_two_out_risp_lob", "fldg", "bam_s_so", "bis_s_hr", "bam_s_bb", "hbp", "bis_s_sb", "bam_obp", "so", "sf",
+                            "bat_order", "bis_s_so","sb","bam_slg","po","bam_avg","hr","bis_ops","bam_ops","bis_slg","rbi","id","lob",
+                            "d","e","a","two_out_risp_lob","bam_s_hr","bam_s_r","h","bis_s_r","bis_s_rbi","t","bis_s_h","ao","bam_s_h","r","bam_s_rbi","bam_s_e","bis_s_d","bam_s_d","ab","bis_s_e","bis_s_bb",
+                            "team_id","tb","bis_s_cs","go","bam_s_cs","bis_s_t","bam_s_t","gidp","first_gidp",
+                            "first_rbi", "first_two_out_rbi","two_out_rbi","bis_s_pb","bam_s_pb" , "ofa","first_sf","first_sac","cs", "ibb","pk_fldg","pk","pb", "first_pb"),
+         pitcher = nums <- c("bam_s_er","bam_bs","hr","bam_hld","bis_bs","np",
+                             "game_score","id","bis_l","bam_l","bk","bis_w","bf","bis_era","bb","bam_s_so",
+                             "bam_s_bb","bam_w","so","bis_hld","bam_s_r","pitch_order","h","bis_s_r",
+                             "bam_s_ip","bam_era","bis_s_so","bis_s_h","bis_s_ip","bam_s_h","s","ao",
+                             "bis_sv","r","bis_s_er","bam_sv","bis_s_bb","er","out","go","team_id","ir",
+                             "ira", "wp")
+        )
   #For some reason, records are sometimes duplicated, remove them!
   dat <- data.frame(dat[!duplicated(dat),], stringsAsFactors=FALSE)
   nms <- names(dat)
