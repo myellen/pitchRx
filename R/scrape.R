@@ -330,23 +330,6 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     rawboxscore.files <- paste0(gameDir, "/rawboxscore.xml")
     obs <- XML2Obs(rawboxscore.files, as.equiv=TRUE, url.map=FALSE, ...)
     #recycle information on the team level (there are two per file)
-    # obs <- add_key(obs, parent='boxscore', recycle='wind', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='game_type', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='venue_name', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='attendance', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='home_sport_code', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='official_scorer', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='game_pk', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='date', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='status_ind', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='home_league_id', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='elapsed_time', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='game_id', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='venue_id', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='start_time', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='weather', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='gameday_sw', quiet=TRUE)
-    # obs <- add_key(obs, parent='boxscore', recycle='url', quiet=TRUE)
     obs <- add_key(obs, parent = 'boxscore//team', recycle = 'id', key.name="team_id", quiet = TRUE)
     obs <- add_key(obs, parent = 'boxscore//team//batting//batter', recycle = 'id', key.name="batter_id", quiet = TRUE)
     obs <- add_key(obs, parent = 'boxscore//team//pitching//pitcher', recycle = 'id', key.name="pitcher_id", quiet = TRUE)
@@ -355,14 +338,15 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     nms <- gsub("boxscore//team//batting//batter", "batter", nms)
     nms <- gsub("boxscore//team//pitching//pitcher//strikeout", "strikeout", nms)
     nms <- gsub("boxscore//team//pitching//pitcher", "pitcher", nms)
-    nms <- gsub("boxscore//linescore//inning_line_score", "inning_line_score", nms)
+    nms <- gsub("boxscore//linescore", "linescore", nms)
     nms <- gsub("boxscore//team//pitching//pitcher//walk", "walk", nms)
     nms <- gsub("boxscore//team//batting//batter//double", "double", nms)
+    nms <- gsub("boxscore//umpires//umpire", "umpire", nms)
     obs <- setNames(obs, nms)
 
     #no longer need the 'game' and 'game//team' observations
-    #game.idx <- grep("game", nms)
-    #if (length(game.idx) > 0) obs <- obs[-game.idx]
+    game.idx <- c(grep('boxscore//team', nms),grep('inning_line_score', nms))
+    if (length(game.idx) > 0) obs <- obs[-game.idx]
 
     if (exists("tables")){
       tables <- c(tables, collapse_obs2(obs)) #only one table

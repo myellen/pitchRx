@@ -42,6 +42,8 @@ update_db <- function(connect, end = Sys.Date() - 1, ...) {
   if (any(game.tbls %in% tbls)) suffices <- c(suffices, "miniscoreboard.xml")
   player.tbls <- c("player", "coach", "umpire")
   if (any(player.tbls %in% tbls)) suffices <- c(suffices, "players.xml")
+  boxscore.tbls <- c("boxscore","batter")
+  if (any(boxscore.tbls %in% tbls)) suffices <- c(suffices, "rawboxscore.xml")
 
   scrape(start = max(old.dates) + 1, end = end, suffix = suffices, connect = connect, ...)
   # count the number of records per game and rescrape game that are missing records?
