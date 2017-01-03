@@ -374,9 +374,9 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     #tables[["batter"]] <- appendDate(tables[["batter"]])
     #tables[["pitcher"]] <- appendDate(tables[["pitcher"]])
     colnames(tables[["boxscore"]]) <- sub("^date", "date_text", colnames(tables[["boxscore"]]))
-    tables[["boxscore"]] <- appendDate(tables[["boxscore"]])
     #Coerce matrices to data frames; turn appropriate variables into numerics
     for (i in names(tables)) tables[[i]] <- format.table(tables[[i]], name=i)
+    tables[["boxscore"]] <- appendDate(tables[["boxscore"]])
     if (!missing(connect)) {
       #Try to write tables to database, if that fails, write to csv. Then clear up memory
       for (i in names(tables)) export(connect, name = i, value = tables[[i]], template = fields[[i]])
