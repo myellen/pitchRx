@@ -373,6 +373,7 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     names(tables) <- sub("^hitchart//hip$", "hip", names(tables))
     #tables[["batter"]] <- appendDate(tables[["batter"]])
     #tables[["pitcher"]] <- appendDate(tables[["pitcher"]])
+    tables[["boxscore"]]$date <- NULL
     tables[["boxscore"]] <- appendDate(tables[["boxscore"]])
     #Coerce matrices to data frames; turn appropriate variables into numerics
     for (i in names(tables)) tables[[i]] <- format.table(tables[[i]], name=i)
