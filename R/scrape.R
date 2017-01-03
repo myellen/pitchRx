@@ -149,7 +149,7 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
       rm(obs)
       rm(tables)
       message("Collecting garbage")
-      gc()
+      #gc()
     }
   }
 
@@ -184,7 +184,7 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
       rm(obs)
       rm(tables)
       message("Collecting garbage")
-      gc()
+      #gc()
     }
   }
 
@@ -206,7 +206,7 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
       rm(obs)
       rm(tables)
       message("Collecting garbage")
-      gc()
+      #gc()
     }
   }
 
@@ -252,7 +252,7 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
       }
       #Free up some memory
       rm(obs)
-      gc()
+      #gc()
       #simplify table names
       tab.nms <- names(tables)
       tab.nms <- sub("^game//inning//atbat$", "atbat", tab.nms)
@@ -287,7 +287,7 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
         for (i in names(tables)) export(connect, name = i, value = tables[[i]], template = fields[[i]])
         rm(tables)
         message("Collecting garbage")
-        gc()
+        #gc()
       }
     }
   }
@@ -320,7 +320,7 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
       rm(obs)
       rm(tables)
       message("Collecting garbage")
-      gc()
+      #gc()
     }
   }
 
@@ -379,7 +379,7 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
       rm(obs)
       rm(tables)
       message("Collecting garbage")
-      gc()
+      #gc()
     }
   }
 
