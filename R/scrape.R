@@ -312,6 +312,8 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
       tables <- collapse_obs2(obs)
     }
     names(tables) <- sub("^hitchart//hip$", "hip", names(tables))
+    tables[["batter"]] <- appendDate(tables[["batter"]])
+    tables[["pitcher"]] <- appendDate(tables[["pitcher"]])
     #Coerce matrices to data frames; turn appropriate variables into numerics
     for (i in names(tables)) tables[[i]] <- format.table(tables[[i]], name=i)
     if (!missing(connect)) {
