@@ -215,11 +215,12 @@ scrape <- function(start, end, game.ids, suffix = "inning/inning_all.xml", conne
     inning.files <- paste0(gameDir, "/inning/inning_all.xml")
     n.files <- length(inning.files)
     #cap the number of files to be parsed at once (helps avoid exhausting memory)
-    cap <- min(10000, n.files) #200
+    cap <- min(1000, n.files) #200
     if (n.files > cap && missing(connect)) {
       warning("play-by-play data for just the first 200 games will be returned (even though you've asked for", n.files, ")",
               "If you want/need more, please consider using the 'connect' argument.")
     }
+    print(n.files)
     n.loops <- ceiling(n.files/cap)
     for (i in seq_len(n.loops)) {
       print(sprintf("%d of %d", i, n.loops))
